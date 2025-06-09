@@ -183,7 +183,7 @@ else
   UNAME_MACHINE="$(uname -m)"
 
   # On Linux, this script installs to /home/linuxbrew/.linuxbrew only
-  HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
+  HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-$HOME/opt/homebrew}"
   HOMEBREW_REPOSITORY="${HOMEBREW_PREFIX}/Homebrew"
   HOMEBREW_CACHE="${HOME}/.cache/Homebrew"
 
@@ -232,6 +232,7 @@ export HOMEBREW_NO_ANALYTICS_MESSAGE_OUTPUT=1
 unset HAVE_SUDO_ACCESS # unset this from the environment
 
 have_sudo_access() {
+  return 1
   if [[ ! -x "/usr/bin/sudo" ]]
   then
     return 1
@@ -487,7 +488,7 @@ no_usable_ruby() {
 
 outdated_glibc() {
   local glibc_version
-  glibc_version="$(ldd --version | head -n1 | grep -o '[0-9.]*$' | grep -o '^[0-9]\+\.[0-9]\+')"
+  glibc_version="$(/lib/libc.so.6 | head -n1 | grep -o '[0-9.]*$' | grep -o '^[0-9]\+\.[0-9]\+')"
   version_lt "${glibc_version}" "${REQUIRED_GLIBC_VERSION}"
 }
 
