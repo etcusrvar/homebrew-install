@@ -167,7 +167,7 @@ then
     HOMEBREW_REPOSITORY="${HOMEBREW_PREFIX}"
   else
     # On Intel macOS, this script installs to /usr/local only
-    HOMEBREW_PREFIX="/usr/local"
+    HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-${HOME}/opt/homebrew}"
     HOMEBREW_REPOSITORY="${HOMEBREW_PREFIX}/Homebrew"
   fi
   HOMEBREW_CACHE="${HOME}/Library/Caches/Homebrew"
@@ -176,9 +176,9 @@ then
   PERMISSION_FORMAT="%A"
   CHOWN=("/usr/sbin/chown")
   CHGRP=("/usr/bin/chgrp")
-  GROUP="admin"
+  GROUP="$(id -gn)"
   TOUCH=("/usr/bin/touch")
-  INSTALL=("/usr/bin/install" -d -o "root" -g "wheel" -m "0755")
+  INSTALL=("/usr/bin/install" -d -o "${USER}" -g "${GROUP}" -m "0755")
 else
   UNAME_MACHINE="$(uname -m)"
 
@@ -231,14 +231,8 @@ export HOMEBREW_NO_ANALYTICS_MESSAGE_OUTPUT=1
 
 unset HAVE_SUDO_ACCESS # unset this from the environment
 
-# create paths.d file for /opt/homebrew installs
-# (/usr/local/bin is already in the PATH)
-if [[ -d "/etc/paths.d" && "${HOMEBREW_PREFIX}" != "/usr/local" && -x "$(command -v tee)" ]]
-then
-  ADD_PATHS_D=1
-fi
-
 have_sudo_access() {
+  return 1
   if [[ ! -x "/usr/bin/sudo" ]]
   then
     return 1
